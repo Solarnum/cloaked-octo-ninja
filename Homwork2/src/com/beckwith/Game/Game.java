@@ -1,6 +1,7 @@
 package com.beckwith.Game;
 
 import java.applet.Applet;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
@@ -10,6 +11,7 @@ import java.util.Random;
 
 import com.beckwith.framework.GameObject;
 import com.beckwith.framework.ObjectID;
+import com.beckwith.objects.Background;
 import com.beckwith.objects.Garbage;
 import com.beckwith.objects.Player;
 
@@ -32,7 +34,14 @@ public class Game extends Applet implements Runnable, MouseMotionListener {
 	}
 
 	public void run() {
+		Background bg = new Background(0,0,WIDTH,HEIGHT,0, Color.white, ObjectID.background);
+		player = new Player(WIDTH / 2, HEIGHT / 2, 0, ObjectID.player);
+		Garbage garbage = new Garbage(20, 35, 0, ObjectID.garbage);
+		objects.add(bg);
+		objects.add(player);
+		objects.add(garbage);
 		while (t != null) {
+			
 			repaint();
 			try {
 				Thread.sleep(40);
@@ -42,11 +51,7 @@ public class Game extends Applet implements Runnable, MouseMotionListener {
 	}
 
 	public void start() {
-		player = new Player(WIDTH / 2, HEIGHT / 2, 0, ObjectID.player);
-		Garbage garbage = new Garbage(20, 35, 0, ObjectID.garbage);
-
-		objects.add(player);
-		objects.add(garbage);
+		
 
 		// Start Thread
 		t = new Thread(this);

@@ -22,7 +22,8 @@ public class Player extends GameObject {
 
 	private Color playerColor = Color.GRAY;
 	private Polygon triangle;
-	private Double rotateDegrees = 0.0;
+	private Double rotateDegrees = 1.0;
+	private BufferedImage bufferedImage;
 
 	public Player(int x, int y, int speed, ObjectID objID) {
 		super(x, y, speed, objID);
@@ -40,17 +41,17 @@ public class Player extends GameObject {
 
 	@Override
 	public void tick() {
-
+		bufferedImage = createRotatedObject();
+		
 	}
 
 	@Override
 	public void render(Graphics g) {
 		// TODO Auto-generated method stub
-		Graphics2D g2d = (Graphics2D) g.create();
-		BufferedImage img = createRotatedObject();
-		
-		g2d.drawImage(img, X, Y, null);
-		g2d.dispose();
+
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.drawImage(bufferedImage, X, Y, null);
+
 		
 	}
 
@@ -62,25 +63,17 @@ public class Player extends GameObject {
 
 	private BufferedImage createRotatedObject() {
 		
-		BufferedImage img = new BufferedImage(60, 60, BufferedImage.TRANSLUCENT);
+		BufferedImage img = new BufferedImage(30, 30, BufferedImage.TRANSLUCENT);
 
 		Graphics2D g = img.createGraphics();
-//		g.rotate(Math.toRadians(rotateDegrees), triangle.getBounds()
-//				.getCenterX(), triangle.getBounds().getCenterY());
-		System.out.println("Rotate Degrees = " + rotateDegrees);
-
+		g.rotate(rotateDegrees - Math.PI, triangle.getBounds()
+				.getCenterX(), triangle.getBounds().getCenterY());
+		
 		g.setColor(Color.RED);
 		g.fill(triangle);
+		
 		g.dispose();
-		BufferedImage rot  = new BufferedImage(60,60, BufferedImage.TRANSLUCENT);
-		AffineTransform xform = new AffineTransform();
-		xform.translate(triangle.getBounds().getCenterY(), triangle.getBounds().getCenterX());
-		xform.rotate(rotateDegrees);
-		xform.translate(-triangle.getBounds().getCenterY(), -triangle.getBounds().getCenterX());
-		Graphics2D g2d = (Graphics2D) rot.createGraphics();
-		g2d.drawImage(img,xform,null);
-		g2d.dispose();
-		return rot;
+		return img;
 
 	}
 

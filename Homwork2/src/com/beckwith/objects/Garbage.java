@@ -35,7 +35,7 @@ public class Garbage extends GameObject{
 		g2d.draw(garbage);
 		g2d.fill(garbage);
 		
-		g2d.dispose();
+		//g2d.dispose();
 		
 	}
 
