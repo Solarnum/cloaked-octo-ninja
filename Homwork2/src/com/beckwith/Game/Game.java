@@ -5,17 +5,21 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
 import com.beckwith.framework.GameObject;
 import com.beckwith.framework.ObjectID;
 import com.beckwith.objects.Background;
+import com.beckwith.objects.Bullet;
 import com.beckwith.objects.Garbage;
 import com.beckwith.objects.Player;
 
-public class Game extends Applet implements Runnable, MouseMotionListener {
+public class Game extends Applet implements Runnable, MouseMotionListener,
+		MouseListener {
 
 	public static LinkedList<GameObject> objects;
 	public static int WIDTH, HEIGHT;
@@ -31,17 +35,23 @@ public class Game extends Applet implements Runnable, MouseMotionListener {
 		HEIGHT = this.getHeight();
 		objects = new LinkedList<GameObject>();
 		addMouseMotionListener(this);
+		addMouseListener(this);
 	}
 
 	public void run() {
-		Background bg = new Background(0,0,WIDTH,HEIGHT,0, Color.white, ObjectID.background);
+		Background bg = new Background(0, 0, WIDTH, HEIGHT, 0, Color.white,
+				ObjectID.background);
 		player = new Player(WIDTH / 2, HEIGHT / 2, 0, ObjectID.player);
-		Garbage garbage = new Garbage(20, 35, 0, ObjectID.garbage);
+		
 		objects.add(bg);
 		objects.add(player);
-		objects.add(garbage);
+		addGarbage();
+		addGarbage();
+		addGarbage();
+		addGarbage();
+		addGarbage();
 		while (t != null) {
-			
+
 			repaint();
 			try {
 				Thread.sleep(40);
@@ -49,9 +59,31 @@ public class Game extends Applet implements Runnable, MouseMotionListener {
 			}
 		}
 	}
+	
+	public void addGarbage(){
+		int boundX = (WIDTH -150) / 2;
+		int boundY = (HEIGHT - 150) / 2;
+		
+		int rand1[] = {rand.nextInt(175), rand.nextInt(175)};
+		int rand2[] = {rand.nextInt(175)+325, rand.nextInt(175) + 325};
+		if(rand.nextBoolean()){
+			if(rand.nextBoolean()){
+				if(rand.nextBoolean()){
+					rand1 = rand2;
+				}
+			}else{
+				rand1[0] = rand2[1];
+			}
+		}else{
+			rand1[1] = rand2[0];
+		}
+		
+		System.out.println("rand[0]" + rand1[0] + "  rand[1] " + rand1[1]);
+		Garbage garbage = new Garbage(rand1[0], rand1[1], 0, ObjectID.garbage);
+		objects.add(garbage);
+	}
 
 	public void start() {
-		
 
 		// Start Thread
 		t = new Thread(this);
@@ -59,9 +91,35 @@ public class Game extends Applet implements Runnable, MouseMotionListener {
 
 	}
 
-	public void update(Graphics g) {
+	public void checkCollisions(GameObject object) {
 		for (GameObject go : objects) {
-			go.tick();
+			if (go.getCollider() != null) {
+				if (go.checkCollision(object.getCollider()) && go.getID() != object.getID()) {
+					System.out.println("Collision detected between "
+							+ go.getID() + " & " + object.getID());
+					 go.destroy();
+					 object.destroy();
+				}
+			}
+		}
+	}
+
+	public void update(Graphics g) {
+		// for (GameObject go : objects) {
+		// go.tick();
+		//
+		// }
+
+		for (Iterator<GameObject> go = objects.iterator(); go.hasNext();) {
+			GameObject object = go.next();
+			object.tick();
+			if (!object.isAlive()) {
+				System.out.println("Object destroyed  : " + object.getID());
+				go.remove();
+			}
+			if (object.getID() == ObjectID.bullet) {
+				checkCollisions(object);
+			}
 		}
 
 		if (imageBuffer == null) {
@@ -93,9 +151,43 @@ public class Game extends Applet implements Runnable, MouseMotionListener {
 	public void mouseMoved(MouseEvent e) {
 
 		if (player != null) {
-			player.setDegrees(player.calculateDegrees(WIDTH/2, HEIGHT/2, e.getX(), e.getY()));
-			
+			player.setDegrees(player.calculateDegrees(WIDTH / 2, HEIGHT / 2,
+					e.getX(), e.getY()));
+
 		}
+
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if (player != null) {
+			double[] pos = player.getTurretPosition();
+			Bullet bullet = new Bullet((int) pos[0], (int) pos[1], 5,
+					player.getDegrees(), ObjectID.bullet);
+			objects.add(bullet);
+		}
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 

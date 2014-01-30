@@ -37,12 +37,13 @@ public class Garbage extends GameObject{
 		
 		//g2d.dispose();
 		
+		
 	}
 
 	@Override
 	public Rectangle getCollider() {
 		// TODO Auto-generated method stub
-		return null;
+		return garbage.getBounds();
 	}
 
 }
