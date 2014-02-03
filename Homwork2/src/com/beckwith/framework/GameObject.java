@@ -9,7 +9,7 @@ public abstract class GameObject {
 	protected int X, Y, SPEED, VELX, VELY;
 	protected boolean alive = true;
 	protected boolean born =false;
-	protected ObjectID ID;;
+	protected ObjectID ID;
 	
 	public GameObject(int x, int y, int speed, ObjectID objID){
 		X=x;

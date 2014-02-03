@@ -44,11 +44,19 @@ public class Garbage extends GameObject {
 
 		rotateDegrees += increment;
 		double dX;
-		// X
-		double direction = Math.atan((X - 250) / (Y - 250));
+		double direction;
+		if (X > 250 && Y > 250) {
+			direction = Math.atan((X - 250) / (Y - 250));
+		} else if (X > 250 && Y < 250) {
+		    direction = Math.atan((X - 250) / (Y ));
+		} else if(X < 250 && Y >250){
+			direction = Math.atan((X) / (Y-250 ));
+		}else{
+			direction = Math.atan((X) / (Y));
+		}
 		//
-		// X += 2* Math.cos(direction);
-		// Y += 2*Math.sin(direction);
+		X += 2 * Math.cos(direction-Math.PI);
+		Y += 2 * Math.sin(direction-Math.PI);
 
 	}
 
