@@ -15,6 +15,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+
+
 import com.beckwith.framework.GameObject;
 import com.beckwith.framework.ObjectID;
 
@@ -45,20 +47,18 @@ public class Garbage extends GameObject {
 		rotateDegrees += increment;
 		double dX;
 		double direction;
-		if (X > 250 && Y > 250) {
-			direction = Math.atan((X - 250) / (Y - 250));
-		} else if (X > 250 && Y < 250) {
-		    direction = Math.atan((X - 250) / (Y ));
-		} else if(X < 250 && Y >250){
-			direction = Math.atan((X) / (Y-250 ));
-		}else{
-			direction = Math.atan((X) / (Y));
-		}
-		//
-		X += 2 * Math.cos(direction-Math.PI);
-		Y += 2 * Math.sin(direction-Math.PI);
+		double xDif = 250 -X;
+		double yDif = 250 -Y;
+			direction = Math.atan((yDif) / (xDif));
+		
+	
+		
+		X +=  2 * Math.cos(direction);
+		Y += 2 *  Math.sin(direction);
 
 	}
+	
+	
 
 	@Override
 	public void render(Graphics g) {
