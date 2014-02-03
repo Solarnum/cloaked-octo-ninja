@@ -24,6 +24,7 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 		MouseListener {
 
 	public static LinkedList<GameObject> objects;
+	public static LinkedList<GameObject> waitingObjects;
 	public static int WIDTH, HEIGHT;
 	private Player player;
 
@@ -38,6 +39,7 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 		WIDTH = this.getWidth();
 		HEIGHT = this.getHeight();
 		objects = new LinkedList<GameObject>();
+		waitingObjects = new LinkedList<GameObject>();
 		addMouseMotionListener(this);
 		addMouseListener(this);
 	}
@@ -47,8 +49,8 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 				ObjectID.background);
 		player = new Player(WIDTH / 2, HEIGHT / 2, 0, ObjectID.player);
 
-		objects.add(bg);
-		objects.add(player);
+		waitingObjects.add(bg);
+		waitingObjects.add(player);
 		addGarbage();
 		addGarbage();
 		addGarbage();
@@ -64,12 +66,17 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 		}
 	}
 
+	/*
+	 * Add enemy garbage to the playing field in a random way.
+	 */
 	public void addGarbage() {
-		int boundX = (WIDTH - 150) / 2;
-		int boundY = (HEIGHT - 150) / 2;
+		int boundX = (WIDTH - 120) / 2;
+		int boundY = (HEIGHT - 120) / 2;
 
-		int rand1[] = { rand.nextInt(175), rand.nextInt(175) };
-		int rand2[] = { rand.nextInt(175) + 325, rand.nextInt(175) + 325 };
+		int rand1[] = { 30 + rand.nextInt(WIDTH / 2 - 100),
+				30 + rand.nextInt(WIDTH / 2 - 100) };
+		int rand2[] = { (int) (245 + (Math.random() * (500 - 275))),
+				(int) (245 + (Math.random() * (500 - 275))) };
 		if (rand.nextBoolean()) {
 			if (rand.nextBoolean()) {
 				if (rand.nextBoolean()) {
@@ -82,9 +89,15 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 			rand1[1] = rand2[0];
 		}
 
-		System.out.println("rand[0]" + rand1[0] + "  rand[1] " + rand1[1]);
+		System.out.println("rand[0] " + rand1[0] + "  rand[1] " + rand1[1]);
 		Garbage garbage = new Garbage(rand1[0], rand1[1], 0, ObjectID.garbage);
-		objects.add(garbage);
+
+		if (rand1[0] > WIDTH - 30 || rand1[0] < 30 || rand1[1] > HEIGHT - 30
+				|| rand1[1] < 30) {
+			addGarbage();
+		} else {
+			waitingObjects.add(garbage);
+		}
 	}
 
 	public void start() {
@@ -95,35 +108,60 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 
 	}
 
+	// Method for checking collisions
 	public void checkCollisions(GameObject object) {
-		for (GameObject go : objects) {
-			if (go.getCollider() != null) {
-				if (go.checkCollision(object.getCollider())
-						&& go.getID() != object.getID()) {
-					System.out.println("Collision detected between "
-							+ go.getID() + " & " + object.getID());
-					go.destroy();
-					object.destroy();
+
+		for (Iterator<GameObject> objecta = objects.iterator(); objecta
+				.hasNext();) {
+			GameObject go = objecta.next();
+			try {
+				if (go.getCollider() != null && go.getID() != object.getID()
+						&& go.born()) {
+					if (object.getID() == ObjectID.background) {
+						if (!object.containsRect(go.getCollider())) {
+							go.destroy();
+							System.out
+									.println("Object out of bounds -- Destroyed : "
+											+ go.getID());
+						}
+					} else if (go.containsPoint(object.getCollider().x,
+							object.getCollider().y)) {
+						System.out
+								.println("Contained Collision detected between "
+										+ go.getID() + " & " + object.getID());
+						go.destroy();
+						object.destroy();
+					}
 				}
+			} catch (NullPointerException n) {
+
 			}
+
 		}
+
 	}
 
 	public void update(Graphics g) {
-		// for (GameObject go : objects) {
-		// go.tick();
-		//
-		// }
 
+		// Checks object waiting list for any objects waiting to enter the game.
+		for (Iterator<GameObject> future = waitingObjects.iterator(); future
+				.hasNext();) {
+			GameObject object = future.next();
+			objects.add(object);
+			future.remove();
+		}
+		// Performs tick on each active object.
 		for (Iterator<GameObject> go = objects.iterator(); go.hasNext();) {
 			GameObject object = go.next();
 			object.tick();
 			if (!object.isAlive()) {
-				System.out.println("Object destroyed  : " + object.getID());
+
 				go.remove();
-				
+
 			}
-			if (object.getID() == ObjectID.bullet) {
+			// If an object is a bullet then checkCollisions is performed.
+			if (object.getID() == ObjectID.bullet
+					|| object.getID() == ObjectID.background) {
 				checkCollisions(object);
 			}
 		}
@@ -138,8 +176,9 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 	}
 
 	public void paint(Graphics g) {
-		for (GameObject go : objects) {
-			go.render(g);
+		for (Iterator<GameObject> go = objects.iterator(); go.hasNext();) {
+			GameObject object = go.next();
+			object.render(g);
 		}
 	}
 
@@ -166,12 +205,7 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (player != null) {
-			double[] pos = player.getTurretPosition();
-			Bullet bullet = new Bullet((int) pos[0], (int) pos[1], 5,
-					player.getDegrees(), ObjectID.bullet);
-			objects.add(bullet);
-		}
+
 	}
 
 	@Override
@@ -188,9 +222,18 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+
+		// If control is held down shoot a barage of bullets.
 		if (e.isControlDown()) {
 			task = new MyTimerTask();
 			timer.scheduleAtFixedRate(task, 0, 10);
+		} else {
+			if (player != null) {
+				double[] pos = player.getTurretPosition();
+				Bullet bullet = new Bullet((int) pos[0], (int) pos[1], 5,
+						player.getDegrees(), ObjectID.bullet);
+				waitingObjects.add(bullet);
+			}
 		}
 	}
 
@@ -207,7 +250,7 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 			double[] pos = player.getTurretPosition();
 			Bullet bullet = new Bullet((int) pos[0], (int) pos[1], 5,
 					player.getDegrees(), ObjectID.bullet);
-			objects.add(bullet);
+			waitingObjects.add(bullet);
 		}
 	}
 

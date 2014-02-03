@@ -20,7 +20,7 @@ public class Bullet extends GameObject {
 	BufferedImage currentBullet;
 	double dX;
 	double dY;
-	double dXdY[][] = new double[4][2];
+	double dXdY[][] = new double[5][2];
 	int dt = 0;
 
 	Ellipse2D.Double bullet;
@@ -31,7 +31,7 @@ public class Bullet extends GameObject {
 		dY = y;
 		dirAngle = degrees;
 		bullet = new Ellipse2D.Double(5, 5, 10, 10);
-		for (int i = 0; i <= 3; i++) {
+		for (int i = 0; i <= 4; i++) {
 			dXdY[i][0] = 0;
 			dXdY[i][1] = 0;
 		}
@@ -40,9 +40,9 @@ public class Bullet extends GameObject {
 	@Override
 	public void tick() {
 		dt++;
-		dXdY[3][0] = dX;
-		dXdY[3][1] = dY;
-		for (int i = 0; i < 3; i++) {
+		dXdY[4][0] = dX;
+		dXdY[4][1] = dY;
+		for (int i = 0; i < 4; i++) {
 				dXdY[i][0] = dXdY[i + 1][0];
 				dXdY[i][1] = dXdY[i + 1][1];
 		}
@@ -53,9 +53,9 @@ public class Bullet extends GameObject {
 	}
 	
 	public double decrementSpeed(int dt){
-		if(SPEED - dt*.04 > .1){
+		if(SPEED - dt*.040 > .1){
 			
-			return SPEED - dt*.04;
+			return SPEED - dt*.040;
 		}else{
 			destroy();
 			return 0;
@@ -90,7 +90,23 @@ public class Bullet extends GameObject {
 		Graphics2D g = img.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
-
+//		switch(i){
+//		case 0:
+//			g.setColor(Color.magenta);
+//			break;
+//		case 1:
+//			g.setColor(Color.cyan);
+//			break;
+//		case 2:
+//			g.setColor(Color.green);
+//			break;
+//		case 3:
+//			g.setColor(Color.orange);
+//			break;
+//		default:
+//			g.setColor(Color.black);
+//			break;
+//		}
 		g.setColor(Color.black);
 		if (i == 0) {
 			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,

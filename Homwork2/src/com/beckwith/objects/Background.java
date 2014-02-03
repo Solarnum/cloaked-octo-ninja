@@ -40,7 +40,7 @@ public class Background extends GameObject{
 	@Override
 	public Rectangle getCollider() {
 		// TODO Auto-generated method stub
-		return null;
+		return new Rectangle(0,0,WIDTH,HEIGHT);
 	}
 	
 	private BufferedImage createGradientImg(int width, int height, Color first, Color second, boolean vertical) {

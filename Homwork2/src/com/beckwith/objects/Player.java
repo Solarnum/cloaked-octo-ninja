@@ -31,12 +31,6 @@ public class Player extends GameObject {
 	public Player(int x, int y, int speed, ObjectID objID) {
 		super(x, y, speed, objID);
 
-		// int xPoints[] = { 0, 20, 0 };
-		// int yPoints[] = { 0, 20, 20 };
-
-		// int xPoints[] = { 10, 10, 20, 0, 15, 30, 20, 20, 10 };
-		// int yPoints[] = { 0, 20, 20, 20, 30, 20, 20, 0, 0 };
-
 		int xPoints[] = { 35, 35, 45, 45, 35 };
 		int yPoints[] = { 40, 80, 80, 30, 30 };
 
@@ -52,17 +46,17 @@ public class Player extends GameObject {
 
 	@Override
 	public void render(Graphics g) {
-		
 
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.drawImage(bufferedImage, X - bufferedImage.getWidth() / 2, Y
-				- bufferedImage.getHeight() / 2, null);
-
+		if (bufferedImage != null) {
+			g2d.drawImage(bufferedImage, X - bufferedImage.getWidth() / 2, Y
+					- bufferedImage.getHeight() / 2, null);
+		}
 	}
 
 	@Override
 	public Rectangle getCollider() {
-		
+
 		return null;
 	}
 
@@ -81,7 +75,7 @@ public class Player extends GameObject {
 
 		g.fill(turret);
 		g.fill(turretBase);
-		
+
 		g.dispose();
 		return img;
 
@@ -90,11 +84,11 @@ public class Player extends GameObject {
 	public double[] getTurretPosition() {
 		double degreePos = 0.0;
 
-		double xPosition = Math.cos(rotateDegrees - Math.PI/2)
+		double xPosition = Math.cos(rotateDegrees - Math.PI / 2)
 				* (turret.getBounds().getHeight() - 10);
 
-		double yPosition = Math.sin(rotateDegrees - Math.PI/2)
-				* (turret.getBounds().getHeight() -10);
+		double yPosition = Math.sin(rotateDegrees - Math.PI / 2)
+				* (turret.getBounds().getHeight() - 10);
 
 		double turretXPos = X;
 		double turretYPos = Y;
