@@ -308,7 +308,9 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 				Bullet bullet = new Bullet((int) pos[0], (int) pos[1], 5,
 						player.getDegrees(), ObjectID.bullet);
 				waitingObjects.add(bullet);
+				Synth.setInstrument(1, 127);
 				Synth.playNote(bulletNote);
+				Synth.setInstrument(1, 30);
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 package com.beckwith.objects;
 
-import java.awt.Color;
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -12,7 +12,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import com.beckwith.framework.GameObject;
@@ -86,10 +85,10 @@ public class Garbage extends GameObject {
 
 	@Override
 	public Rectangle getCollider() {
-		Rectangle2D rec = new Rectangle2D.Double(X, Y, 30, 30);
-		AffineTransform at = AffineTransform.getRotateInstance(rotateDegrees);
-		Shape rotatedGarbage = at.createTransformedShape(rec);
-		Rectangle garbageBounds = rotatedGarbage.getBounds();
+//		Rectangle2D rec = new Rectangle2D.Double(X, Y, 30, 30);
+//		AffineTransform at = AffineTransform.getRotateInstance(rotateDegrees);
+//		Shape rotatedGarbage = at.createTransformedShape(rec);
+//		Rectangle garbageBounds = rotatedGarbage.getBounds();
 
 		return garbageArea.getBounds();
 	}
