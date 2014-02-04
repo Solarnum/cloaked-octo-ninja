@@ -13,12 +13,20 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.sound.midi.Instrument;
+import javax.sound.midi.MidiChannel;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Synthesizer;
+
 import com.beckwith.framework.GameObject;
 import com.beckwith.framework.ObjectID;
 import com.beckwith.objects.Background;
 import com.beckwith.objects.Bullet;
+import com.beckwith.objects.Countdown;
 import com.beckwith.objects.Garbage;
 import com.beckwith.objects.Player;
+import com.beckwith.sound.SynthSound;
 
 public class Game extends Applet implements Runnable, MouseMotionListener,
 		MouseListener {
@@ -34,28 +42,38 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 	Random rand = new Random();
 
 	Timer timer = new Timer();
+	Countdown cd;
+	int level = 0;
+	boolean levelComplete = false;
+	boolean levelWon = false;
+	boolean levelLost = false;
+	SynthSound Synth;
+	
+	public int bulletNote = 55;
 
 	public void init() {
 		WIDTH = this.getWidth();
 		HEIGHT = this.getHeight();
-		objects = new LinkedList<GameObject>();
-		waitingObjects = new LinkedList<GameObject>();
+
 		addMouseMotionListener(this);
 		addMouseListener(this);
 	}
 
 	public void run() {
+		objects = new LinkedList<GameObject>();
+		waitingObjects = new LinkedList<GameObject>();
 		Background bg = new Background(0, 0, WIDTH, HEIGHT, 0, Color.white,
 				ObjectID.background);
 		player = new Player(WIDTH / 2, HEIGHT / 2, 0, ObjectID.player);
 
 		waitingObjects.add(bg);
 		waitingObjects.add(player);
-		addGarbage();
-		addGarbage();
-		addGarbage();
-		addGarbage();
-		addGarbage();
+		populateLevel();
+		levelWon=false;
+		cd = new Countdown(level, 0, 0, ObjectID.countdown);
+		waitingObjects.add(cd);
+		Synth = new SynthSound();
+		Synth.playChord(55);
 		while (t != null) {
 
 			repaint();
@@ -63,6 +81,16 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 				Thread.sleep(40);
 			} catch (InterruptedException e) {
 			}
+			
+		}
+	}
+
+	public void populateLevel() {
+		Garbage garbage = new Garbage(270, 120, 0, ObjectID.garbage);
+
+		// waitingObjects.add(garbage);
+		for (int i = 0; i < level + 5; i++) {
+			addGarbage();
 		}
 	}
 
@@ -120,17 +148,17 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 					if (object.getID() == ObjectID.background) {
 						if (!object.containsRect(go.getCollider())) {
 							go.destroy();
-							System.out
-									.println("Object out of bounds -- Destroyed : "
-											+ go.getID());
+							
+							
 						}
 					} else if (go.containsPoint(object.getCollider().x,
 							object.getCollider().y)) {
-						System.out
-								.println("Contained Collision detected between "
-										+ go.getID() + " & " + object.getID());
+						
 						go.destroy();
 						object.destroy();
+						Synth.playNote(bulletNote);
+						bulletNote +=5;
+						
 					}
 				}
 			} catch (NullPointerException n) {
@@ -141,29 +169,55 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 
 	}
 
-	public void update(Graphics g) {
+	public void resetGame(){
+		levelWon = false;
+		levelComplete = false;
+		levelLost = false;
+		bulletNote = 55;
 
+	}
+	public void update(Graphics g) {
+		if (levelWon) {
+			this.stop();
+			levelComplete = true;
+			cd.gameWon();
+			
+		}
+		// Checks if game is over
+		if (cd.isGameOver()) {
+			this.stop();
+			Synth.playChord(52);
+			levelLost = true;
+		}
+		int numGarbage = 0;
 		// Checks object waiting list for any objects waiting to enter the game.
 		for (Iterator<GameObject> future = waitingObjects.iterator(); future
 				.hasNext();) {
+
 			GameObject object = future.next();
+
 			objects.add(object);
 			future.remove();
 		}
 		// Performs tick on each active object.
+
 		for (Iterator<GameObject> go = objects.iterator(); go.hasNext();) {
 			GameObject object = go.next();
 			object.tick();
 			if (!object.isAlive()) {
-
 				go.remove();
-
 			}
+			if (object.getID() == ObjectID.garbage)
+				numGarbage++;
+			
 			// If an object is a bullet then checkCollisions is performed.
 			if (object.getID() == ObjectID.bullet
 					|| object.getID() == ObjectID.background) {
 				checkCollisions(object);
 			}
+		}
+		if (numGarbage == 0) {
+			levelWon = true;
 		}
 
 		if (imageBuffer == null) {
@@ -205,7 +259,17 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-
+		if (levelComplete) {
+			level++;
+			resetGame();
+			start();
+		}
+		
+		if (levelLost) {
+			level = 0;
+			resetGame();
+			start();
+		}
 	}
 
 	@Override
@@ -233,6 +297,7 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 				Bullet bullet = new Bullet((int) pos[0], (int) pos[1], 5,
 						player.getDegrees(), ObjectID.bullet);
 				waitingObjects.add(bullet);
+				Synth.playNote(53);
 			}
 		}
 	}
@@ -253,5 +318,7 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 			waitingObjects.add(bullet);
 		}
 	}
+	
+
 
 }

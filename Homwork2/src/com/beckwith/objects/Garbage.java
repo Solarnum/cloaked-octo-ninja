@@ -15,8 +15,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-
-
 import com.beckwith.framework.GameObject;
 import com.beckwith.framework.ObjectID;
 
@@ -27,6 +25,8 @@ public class Garbage extends GameObject {
 	double turnSpeed = 0.0;
 	Random rand = new Random();
 	private Area garbageArea;
+	private double VelocityX;
+	private double VelocityY;
 
 	public Garbage(int x, int y, int speed, ObjectID objID) {
 		super(x, y, speed, objID);
@@ -47,18 +47,27 @@ public class Garbage extends GameObject {
 		rotateDegrees += increment;
 		double dX;
 		double direction;
-		double xDif = 250 -X;
-		double yDif = 250 -Y;
-			direction = Math.atan((yDif) / (xDif));
-		
-	
-		
-		X +=  2 * Math.cos(direction);
-		Y += 2 *  Math.sin(direction);
+		double xDif = 250 - X;
+		double yDif = 250 - Y;
+		direction = Math.atan((yDif) / (xDif));
 
+		if (X > 250 && VelocityX > -3) {
+			VelocityX-=.2;
+		} else if (X < 250 && VelocityX < 3) {
+			VelocityX+=.2;
+		}
+		if (Y > 250 && VelocityY > -3) {
+			VelocityY-=.2;
+			System.out.println("number " + (2 * Math.sin(direction)));
+		} else if (Y <= 250 && VelocityY < 3) {
+			VelocityY+=.2;
+		}
+		X += ( VelocityX * Math.cos(Math.toRadians(direction)));
+		Y += -(VelocityY * Math.sin(direction));
+		
+		
+		//System.out.println("X = "+ X + " :  Y = " + Y);
 	}
-	
-	
 
 	@Override
 	public void render(Graphics g) {

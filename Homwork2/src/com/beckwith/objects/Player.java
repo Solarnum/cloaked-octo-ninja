@@ -49,8 +49,8 @@ public class Player extends GameObject {
 
 		Graphics2D g2d = (Graphics2D) g;
 		if (bufferedImage != null) {
-			g2d.drawImage(bufferedImage, X - bufferedImage.getWidth() / 2, Y
-					- bufferedImage.getHeight() / 2, null);
+			g2d.drawImage(bufferedImage, (int) (X - bufferedImage.getWidth() / 2),(int)( Y
+					- bufferedImage.getHeight() / 2), null);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class Player extends GameObject {
 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setColor(Color.RED);
+		g.setColor(Color.BLUE);
 
 		g.fill(turret);
 		g.fill(turretBase);

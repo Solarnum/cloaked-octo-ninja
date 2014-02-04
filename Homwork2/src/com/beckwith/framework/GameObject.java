@@ -6,7 +6,8 @@ import java.awt.Rectangle;
 
 public abstract class GameObject {
 
-	protected int X, Y, SPEED, VELX, VELY;
+	protected double X, Y;
+	protected int SPEED, VELX, VELY;
 	protected boolean alive = true;
 	protected boolean born =false;
 	protected ObjectID ID;

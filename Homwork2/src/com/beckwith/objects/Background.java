@@ -33,7 +33,7 @@ public class Background extends GameObject{
 	public void render(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		BufferedImage img = createGradientImg(WIDTH, HEIGHT, HUE.brighter(), HUE.darker(), true);
-		g2d.drawImage(img, X, Y, null);
+		g2d.drawImage(img, (int) X, (int) Y, null);
 		
 	}
 

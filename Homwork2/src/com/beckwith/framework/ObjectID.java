@@ -4,5 +4,6 @@ public enum ObjectID {
 	player,
 	garbage,
 	background,
-	bullet
+	bullet,
+	countdown
 }
