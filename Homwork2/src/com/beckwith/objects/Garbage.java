@@ -41,7 +41,7 @@ public class Garbage extends GameObject {
 	}
 
 	@Override
-	public void tick() {
+	public void clock() {
 		double increment = turnSpeed * .1;
 
 		rotateDegrees += increment;
@@ -58,7 +58,7 @@ public class Garbage extends GameObject {
 		}
 		if (Y > 250 && VelocityY > -3) {
 			VelocityY-=.2;
-			System.out.println("number " + (2 * Math.sin(direction)));
+			
 		} else if (Y <= 250 && VelocityY < 3) {
 			VelocityY+=.2;
 		}

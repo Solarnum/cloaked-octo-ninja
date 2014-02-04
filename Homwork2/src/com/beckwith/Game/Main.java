@@ -1,3 +1,17 @@
+/*
+ 
+  Author: Charlie Beckwith
+  
+  Title: Homework 2
+  
+  Due Date: January 3rd, 2014
+  Objective: The objective of this game is to aim and shoot at the black squares. 
+  Eliminate all of them to pass on to the next level which will have one more square.
+  There is no way to win. The game will continue until you do not manage to shoot all
+  the black squares within the time limit at which point you will lose. 
+  
+  
+ */
 package com.beckwith.Game;
 
 import java.applet.Applet;
@@ -13,11 +27,6 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.sound.midi.Instrument;
-import javax.sound.midi.MidiChannel;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Synthesizer;
 
 import com.beckwith.framework.GameObject;
 import com.beckwith.framework.ObjectID;
@@ -28,7 +37,7 @@ import com.beckwith.objects.Garbage;
 import com.beckwith.objects.Player;
 import com.beckwith.sound.SynthSound;
 
-public class Game extends Applet implements Runnable, MouseMotionListener,
+public class Main extends Applet implements Runnable, MouseMotionListener,
 		MouseListener {
 
 	public static LinkedList<GameObject> objects;
@@ -49,12 +58,14 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 	boolean levelLost = false;
 	SynthSound Synth;
 	
-	public int bulletNote = 55;
+	public int hitNote = 55;
+	private int bulletNote = 55;
 
 	public void init() {
 		WIDTH = this.getWidth();
 		HEIGHT = this.getHeight();
-
+		Synth = new SynthSound();
+		Synth.setInstrument(1, 30);
 		addMouseMotionListener(this);
 		addMouseListener(this);
 	}
@@ -72,8 +83,8 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 		levelWon=false;
 		cd = new Countdown(level, 0, 0, ObjectID.countdown);
 		waitingObjects.add(cd);
-		Synth = new SynthSound();
-		Synth.playChord(55);
+		
+		
 		while (t != null) {
 
 			repaint();
@@ -147,17 +158,15 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 						&& go.born()) {
 					if (object.getID() == ObjectID.background) {
 						if (!object.containsRect(go.getCollider())) {
-							go.destroy();
-							
-							
+							go.destroy();	
 						}
 					} else if (go.containsPoint(object.getCollider().x,
 							object.getCollider().y)) {
 						
 						go.destroy();
 						object.destroy();
-						Synth.playNote(bulletNote);
-						bulletNote +=5;
+						Synth.playNote(hitNote);
+						hitNote +=5;
 						
 					}
 				}
@@ -173,7 +182,9 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 		levelWon = false;
 		levelComplete = false;
 		levelLost = false;
-		bulletNote = 55;
+		hitNote = bulletNote;
+		
+		Synth.playChord(55);
 
 	}
 	public void update(Graphics g) {
@@ -203,7 +214,7 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 
 		for (Iterator<GameObject> go = objects.iterator(); go.hasNext();) {
 			GameObject object = go.next();
-			object.tick();
+			object.clock();
 			if (!object.isAlive()) {
 				go.remove();
 			}
@@ -297,7 +308,7 @@ public class Game extends Applet implements Runnable, MouseMotionListener,
 				Bullet bullet = new Bullet((int) pos[0], (int) pos[1], 5,
 						player.getDegrees(), ObjectID.bullet);
 				waitingObjects.add(bullet);
-				Synth.playNote(53);
+				Synth.playNote(bulletNote);
 			}
 		}
 	}

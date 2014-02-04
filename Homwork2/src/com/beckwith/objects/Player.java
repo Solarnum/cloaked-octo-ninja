@@ -27,6 +27,7 @@ public class Player extends GameObject {
 	private double rotateDegrees = 1.0;
 	private BufferedImage bufferedImage;
 	private Ellipse2D.Double turretBase;
+	private Ellipse2D.Double turretSubBase;
 
 	public Player(int x, int y, int speed, ObjectID objID) {
 		super(x, y, speed, objID);
@@ -36,10 +37,11 @@ public class Player extends GameObject {
 
 		turret = new Polygon(xPoints, yPoints, 5);
 		turretBase = new Ellipse2D.Double(20, 20, 40, 40);
+		turretSubBase= new Ellipse2D.Double(30, 30, 20, 20);
 	}
 
 	@Override
-	public void tick() {
+	public void clock() {
 		bufferedImage = createRotatedObject();
 
 	}
@@ -72,9 +74,11 @@ public class Player extends GameObject {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(Color.BLUE);
-
-		g.fill(turret);
 		g.fill(turretBase);
+		g.fill(turret);
+		g.setColor(Color.black);
+		g.draw(turretSubBase);
+		
 
 		g.dispose();
 		return img;

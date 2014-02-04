@@ -19,7 +19,7 @@ public abstract class GameObject {
 		ID = objID;
 	}
 	
-	public abstract void tick();
+	public abstract void clock();
 	public abstract void render(Graphics g);
 	public abstract Rectangle getCollider();
 	

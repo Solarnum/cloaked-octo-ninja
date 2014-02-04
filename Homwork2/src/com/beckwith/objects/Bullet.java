@@ -38,7 +38,7 @@ public class Bullet extends GameObject {
 	}
 
 	@Override
-	public void tick() {
+	public void clock() {
 		dt++;
 		dXdY[4][0] = dX;
 		dXdY[4][1] = dY;

@@ -24,7 +24,7 @@ public class Background extends GameObject{
 	}
 
 	@Override
-	public void tick() {
+	public void clock() {
 		// TODO Auto-generated method stub
 		
 	}
