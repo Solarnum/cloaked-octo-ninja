@@ -83,7 +83,10 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 		levelWon=false;
 		cd = new Countdown(level, 0, 0, ObjectID.countdown);
 		waitingObjects.add(cd);
-		
+		int k = 5;
+		int j = 0;
+		j=k=k+1;
+		System.out.println("j = " + j + " k = "  +k);
 		
 		while (t != null) {
 
