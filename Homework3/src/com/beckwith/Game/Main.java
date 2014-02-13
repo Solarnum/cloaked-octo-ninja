@@ -32,13 +32,14 @@ import java.util.TimerTask;
 import com.beckwith.framework.GameObject;
 import com.beckwith.framework.ObjectID;
 import com.beckwith.objects.Background;
-import com.beckwith.objects.Bullet;
 import com.beckwith.objects.Countdown;
 import com.beckwith.objects.DustBunny;
 import com.beckwith.objects.Garbage;
-import com.beckwith.objects.Player;
 import com.beckwith.objects.Roomba;
 import com.beckwith.sound.SynthSound;
+
+
+import com.beckwith.*;
 
 public class Main extends Applet implements Runnable, MouseMotionListener,
 		MouseListener, KeyListener {
@@ -62,6 +63,7 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 	boolean levelWon = false;
 	boolean levelLost = false;
 	SynthSound Synth;
+
 	
 	public int hitNote = 55;
 	private int bulletNote = 55;
