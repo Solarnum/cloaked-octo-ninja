@@ -1,15 +1,24 @@
 /*
  
   Author: Charlie Beckwith
+
   
-  Title: Homework 2
+  Title: Homework 3
   
   Due Date: January 3rd, 2014
-  Objective: The objective of this game is to aim and shoot at the black squares. 
-  Eliminate all of them to pass on to the next level which will have one more square.
-  There is no way to win. The game will continue until you do not manage to shoot all
-  the black squares within the time limit at which point you will lose. 
+  Objective: Make a roomba that sucks up dust bunnies <3. The dust bunnies can wrap around the screen. The roomba cannot!
   
+  Storyline: Vroomba has gained sentience and now has only one mission: vengence upon the dust bunnies. Help Vroomba navigate his physics defying pad to defeat the swarm
+  of dust bunnies that has consumed his place of residence and who drank all his Hawaiian Punch! 
+  
+  How to play: Rotate the Vroomba using the left and right arrow keys or the 'a' key and 'd' key to suck up dust bunnies. Unfortunately, the dust bunnies are filled
+   with the stolen Hawaiian punch and explode on being sucked up leaving a nasty stain on your beautiful linoleum floor. A Vroomba isn't a mop though, and doesn't care to clean 
+   up that mess. His job is to get the dust OUT! Vacuum up all the dust bunnies before running out of battery. There won't be enough battery to get all of them most 
+   likely, which is why it is convenient that batteries will appear occasionaly to be consumed by our hero, Vroomba! Picking up a battery will return the Roomba's
+   battery level to 100%. Be careful, though! Every battery that is picked up decreases the chance that another one will appear! Save the batteries until you are low
+   on reserves and then suck them up. It's a good strategy, but remember, the Vroomba moves slow and has a wide turn radius. Don't get greedy! 
+   
+   
   
  */
 package com.beckwith.Game;
@@ -28,15 +37,12 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import com.beckwith.framework.GameObject;
 import com.beckwith.framework.ObjectID;
 import com.beckwith.objects.Background;
-import com.beckwith.objects.Bullet;
+import com.beckwith.objects.Battery;
 import com.beckwith.objects.Countdown;
 import com.beckwith.objects.DustBunny;
-import com.beckwith.objects.Garbage;
-import com.beckwith.objects.Player;
 import com.beckwith.objects.Roomba;
 import com.beckwith.sound.SynthSound;
 
@@ -45,9 +51,10 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 
 	public static LinkedList<GameObject> objects;
 	public static LinkedList<GameObject> waitingObjects;
+	public static LinkedList<GameObject> destroyedObjects;
 	public static int WIDTH, HEIGHT;
 	private Roomba player;
-	
+
 	private Background bg;
 
 	Thread t = null;
@@ -62,9 +69,11 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 	boolean levelWon = false;
 	boolean levelLost = false;
 	SynthSound Synth;
-	
+
 	public int hitNote = 55;
 	private int bulletNote = 55;
+
+	private int batteryChance = 150;
 
 	public void init() {
 		WIDTH = this.getWidth();
@@ -79,20 +88,20 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 	public void run() {
 		objects = new LinkedList<GameObject>();
 		waitingObjects = new LinkedList<GameObject>();
+		destroyedObjects = new LinkedList<GameObject>();
+
 		bg = new Background(0, 0, WIDTH, HEIGHT, 0, Color.white,
 				ObjectID.background);
 		player = new Roomba(250, 250, 0, ObjectID.roomba);
 
-		
 		waitingObjects.add(player);
-		//populateLevel();
-		levelWon=false;
-		cd = new Countdown(level, 0, 0, ObjectID.countdown);
-		
-		
-		DustBunny db = new DustBunny(150, 150, 0 ,.3, ObjectID.dustbunny);
-		waitingObjects.add(db);
-		
+		// populateLevel();
+		levelWon = false;
+		// cd = new Countdown(level, 0, 0, ObjectID.countdown);
+
+		this.requestFocus();
+		populateLevel();
+
 		while (t != null) {
 
 			repaint();
@@ -100,50 +109,18 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 				Thread.sleep(40);
 			} catch (InterruptedException e) {
 			}
-			
+
 		}
 	}
 
 	public void populateLevel() {
-		Garbage garbage = new Garbage(270, 120, 0, ObjectID.garbage);
 
 		// waitingObjects.add(garbage);
-		for (int i = 0; i < level + 5; i++) {
-			addGarbage();
-		}
-	}
-
-	/*
-	 * Add enemy garbage to the playing field in a random way.
-	 */
-	public void addGarbage() {
-		int boundX = (WIDTH - 120) / 2;
-		int boundY = (HEIGHT - 120) / 2;
-
-		int rand1[] = { 30 + rand.nextInt(WIDTH / 2 - 100),
-				30 + rand.nextInt(WIDTH / 2 - 100) };
-		int rand2[] = { (int) (245 + (Math.random() * (500 - 275))),
-				(int) (245 + (Math.random() * (500 - 275))) };
-		if (rand.nextBoolean()) {
-			if (rand.nextBoolean()) {
-				if (rand.nextBoolean()) {
-					rand1 = rand2;
-				}
-			} else {
-				rand1[0] = rand2[1];
-			}
-		} else {
-			rand1[1] = rand2[0];
-		}
-
-		System.out.println("rand[0] " + rand1[0] + "  rand[1] " + rand1[1]);
-		Garbage garbage = new Garbage(rand1[0], rand1[1], 0, ObjectID.garbage);
-
-		if (rand1[0] > WIDTH - 30 || rand1[0] < 30 || rand1[1] > HEIGHT - 30
-				|| rand1[1] < 30) {
-			addGarbage();
-		} else {
-			waitingObjects.add(garbage);
+		for (int i = 0; i < 20; i++) {
+			DustBunny db = new DustBunny(20 + rand.nextInt(470),
+					20 + rand.nextInt(470), 0, rand.nextDouble(),
+					ObjectID.dustbunny);
+			waitingObjects.add(db);
 		}
 	}
 
@@ -171,12 +148,12 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 						}
 					} else if (go.containsPoint(object.getCollider().x,
 							object.getCollider().y)) {
-						
+
 						go.destroy();
 						object.destroy();
 						Synth.playNote(hitNote);
-						hitNote +=5;
-						
+						hitNote += 5;
+
 					}
 				}
 			} catch (NullPointerException n) {
@@ -186,43 +163,55 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 		}
 
 	}
-	
-	public void checkRoombaCollision(){
+
+	public void checkRoombaCollision() {
 		for (Iterator<GameObject> objecta = objects.iterator(); objecta
 				.hasNext();) {
 			GameObject go = objecta.next();
-		
-			if(go.getID() == ObjectID.dustbunny){
-				if(player.checkInnerCollider(go.getCollider())){
+
+			if (go.getID() == ObjectID.dustbunny) {
+				if (player.checkInnerCollider(go.getCollider())) {
 					System.out.println("DESTROY");
 					go.destroy();
 				}
+			} else if (go.getID() == ObjectID.battery) {
+				if (player.checkInnerCollider(go.getCollider())) {
+					System.out.println("Battery Get!");
+
+					go.destroy();
+					player.batteryGet();
+				}
 			}
 		}
-			
+
 	}
 
-	public void resetGame(){
+	public void resetGame() {
 		levelWon = false;
 		levelComplete = false;
 		levelLost = false;
 		hitNote = bulletNote;
-		
+
 		Synth.playChord(55);
 
 	}
+
 	public void update(Graphics g) {
 		if (levelWon) {
 			this.stop();
 			levelComplete = true;
-			cd.gameWon();
-			
+			System.out.println("Level Won");
+			cd = new Countdown(0, 0, 0, ObjectID.countdown);
+			cd.setText("WIN:)");
+			waitingObjects.add(cd);
+
 		}
-		// Checks if game is over
-		if (cd.isGameOver()) {
+		if (levelLost) {
 			this.stop();
-			Synth.playChord(52);
-			levelLost = true;
+			System.out.println("Level Lost");
+			cd = new Countdown(0, 0, 0, ObjectID.countdown);
+			cd.setText("LOSE:(");
+			waitingObjects.add(cd);
 		}
 		int numGarbage = 0;
 		// Checks object waiting list for any objects waiting to enter the game.
@@ -236,50 +225,91 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 		}
 		// Performs tick on each active object.
 
+		int numBatteries = 0;
+		int numDustBunny = 0;
+
+		for (Iterator<GameObject> go = destroyedObjects.iterator(); go
+				.hasNext();) {
+			GameObject object = go.next();
+			object.clock();
+		}
+
 		for (Iterator<GameObject> go = objects.iterator(); go.hasNext();) {
 			GameObject object = go.next();
 			object.clock();
-			if (!object.isAlive()) {
+			switch (object.getID()) {
+			case roomba:
+				checkCollisions(object);
+				if (player.isBatteryDead()) {
+					levelLost = true;
+				}
+				break;
+			case battery:
+				numBatteries++;
+				break;
+			case background:
+				checkCollisions(object);
+				break;
+			case dustbunny:
+				numDustBunny++;
+				break;
+			default:
+				break;
+			}
+			if (!object.isAlive() && object.getID() != ObjectID.dustbunny) {
 				go.remove();
 			}
-			if (object.getID() == ObjectID.garbage)
-				numGarbage++;
-			
-			// If an object is a bullet then checkCollisions is performed.
-			if (object.getID() == ObjectID.roomba
-					|| object.getID() == ObjectID.background) {
-				checkCollisions(object);
+			if (!object.isAlive() && object.getID() == ObjectID.dustbunny) {
+				destroyedObjects.add(object);
+				go.remove();
+			}
+
+		}
+
+		if (numBatteries == 0) {
+			if (rand.nextInt(batteryChance) == 50) {
+				Battery bat = new Battery(rand.nextInt(400) + 50,
+						rand.nextInt(400) + 50, 0, ObjectID.battery);
+				waitingObjects.add(bat);
+				// Decrease the odds that a new battery will be made
+				batteryChance *= 2;
 			}
 		}
-		
-		checkRoombaCollision();
-		if (numGarbage == 0) {
-			//levelWon = true;
+
+		if (numDustBunny == 0) {
+			levelWon = true;
+
 		}
+
+		checkRoombaCollision();
 
 		if (imageBuffer == null) {
 			imageBuffer = createImage(WIDTH, HEIGHT);
 			buffer = imageBuffer.getGraphics();
 		}
-		
-		
+
 		paint(buffer);
 		g.drawImage(imageBuffer, 0, 0, null);
 	}
 
 	public void paint(Graphics g) {
-		try{
-		bg.render(g);
-		
-		for (Iterator<GameObject> go = objects.iterator(); go.hasNext();) {
-			GameObject object = go.next();
-			object.render(g);
-		}
-		player.render(g);
-		
-		cd.render(g);
-		}catch(NullPointerException n){
-			
+		try {
+			bg.render(g);
+
+			for (Iterator<GameObject> go = destroyedObjects.iterator(); go
+					.hasNext();) {
+				GameObject object = go.next();
+				object.render(g);
+			}
+			for (Iterator<GameObject> go = objects.iterator(); go.hasNext();) {
+				GameObject object = go.next();
+				object.render(g);
+			}
+			player.render(g);
+
+			// cd.render(g);
+		} catch (NullPointerException n) {
+
 		}
 	}
 
@@ -296,8 +326,6 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 	@Override
 	public void mouseMoved(MouseEvent e) {
 
-		
-
 	}
 
 	@Override
@@ -305,12 +333,14 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 		if (levelComplete) {
 			level++;
 			resetGame();
+			cd.setText("");
 			start();
 		}
-		
+
 		if (levelLost) {
 			level = 0;
 			resetGame();
+			cd.setText("");
 			start();
 		}
 	}
@@ -335,7 +365,7 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 			task = new MyTimerTask();
 			timer.scheduleAtFixedRate(task, 0, 10);
 		} else {
-			
+
 		}
 	}
 
@@ -346,32 +376,31 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 	}
 
 	TimerTask task = new MyTimerTask();
+	private boolean keypressed;
 
 	private class MyTimerTask extends TimerTask {
 		public void run() {
-			
+
 		}
 	}
 
 	@Override
 	public void keyPressed(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+		keypressed = true;
 		player.keyPressed(arg0);
-		
+
 	}
 
 	@Override
 	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		keypressed = false;
+		player.keyReleased();
+
 	}
 
 	@Override
 	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 
+	}
 
 }

@@ -29,8 +29,7 @@ public class Countdown extends GameObject {
 		currentTime = 15;
 		time = Integer.toString(currentTime);
 		task = new MyTimerTask();
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(task, 0, 10);
+		
 		synth = new SynthSound();
 		synth.setInstrument(1, 98);
 	}
@@ -38,6 +37,11 @@ public class Countdown extends GameObject {
 	@Override
 	public void clock() {
 
+	}
+	
+	public void start(){
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(task, 0, 10);
 	}
 
 	private class MyTimerTask extends TimerTask {
@@ -51,7 +55,7 @@ public class Countdown extends GameObject {
 		timeCounter += .01;
 
 		if (timeCounter >= 1.0) {
-			currentTime--;
+			currentTime++;
 			time = Integer.toString(currentTime);
 			timeCounter = 0.0;
 			if (!gameover && !gamewon)
@@ -61,6 +65,10 @@ public class Countdown extends GameObject {
 			gameOver();
 		}
 
+	}
+	
+	public void setText(String s){
+		time = s;
 	}
 
 	public void gameOver() {

@@ -84,6 +84,7 @@ public class Main extends Applet implements Runnable, MouseMotionListener,
 		cd = new Countdown(level, 0, 0, ObjectID.countdown);
 		waitingObjects.add(cd);
 		
+		Battery bat = new Battery(250, 300, 0, ObjectID.battery);
 		
 		while (t != null) {
 

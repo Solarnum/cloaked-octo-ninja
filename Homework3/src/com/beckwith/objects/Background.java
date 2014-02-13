@@ -6,7 +6,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
+import com.beckwith.Game.Main;
 import com.beckwith.framework.GameObject;
 import com.beckwith.framework.ObjectID;
 
@@ -15,12 +19,20 @@ public class Background extends GameObject{
 	private int WIDTH = 32;
 	private int HEIGHT = 32;
 	private Color HUE;
+	private BufferedImage carpetImage;
 	
 	public Background(int x, int y,int width, int height, int speed, Color hue, ObjectID objID) {
 		super(x, y, speed, objID);
 		HUE = hue;
-		WIDTH = width;
-		HEIGHT = height;
+		WIDTH = Main.WIDTH;
+		HEIGHT = Main.HEIGHT;
+		loadResource("linoleum.png");
+		try {
+			carpetImage = ImageIO.read(input);
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -32,8 +44,12 @@ public class Background extends GameObject{
 	@Override
 	public void render(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
-		BufferedImage img = createGradientImg(WIDTH, HEIGHT, HUE.brighter(), HUE.darker(), true);
-		g2d.drawImage(img, (int) X, (int) Y, null);
+		BufferedImage carpetSprite = createImg();
+		for(int i = 0; i < (WIDTH/100);i++){
+			for(int k = 0; k < (HEIGHT/100);k++){
+				g2d.drawImage(carpetImage,i*100,k*100,null);
+			}
+		}
 		
 	}
 
@@ -43,19 +59,12 @@ public class Background extends GameObject{
 		return new Rectangle(0,0,WIDTH,HEIGHT);
 	}
 	
-	private BufferedImage createGradientImg(int width, int height, Color first, Color second, boolean vertical) {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+	private BufferedImage createImg() {
+        BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
-        GradientPaint gradient;
+        g.drawImage(carpetImage,0,0,null);
         
-        if(vertical)
-        	gradient = new GradientPaint(0f, 0f, first, 0f, height, second);
-        else
-        	gradient = new GradientPaint(0f, 0f, first, width, 0f, second); 
         
-        g.setPaint(gradient);
-        g.fillRect(0, 0, width, height);
-        g.dispose();
         return image;
     }
 

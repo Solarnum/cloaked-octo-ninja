@@ -1,11 +1,9 @@
 package com.beckwith.framework;
 
-public enum ObjectID {
-	player,
-	garbage,
+public enum  ObjectID {
 	background,
-	bullet,
 	countdown,
 	roomba,
-	dustbunny
+	dustbunny,
+	battery
 }
